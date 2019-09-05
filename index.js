@@ -6,6 +6,14 @@ const users = ["Dimas", "Jorge", "Renato"];
 
 server.use(express.json());
 
+// Middlware
+server.use((req, res, next) => {
+  console.log(`Método: ${req.method}; URL: ${req.url}`);
+  console.time("Request");
+  next();
+  console.timeEnd("Request");
+});
+
 // CRUD
 //Create
 server.post("/users/", (req, res) => {
