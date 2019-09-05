@@ -17,18 +17,20 @@ server.post("/users/", (req, res) => {
 
 //Read
 server.get("/users/:id/", (req, res) => {
-  // Select user in array of users
+  // Select one user
   const { id } = req.params; // get route params
 
   return res.json(users[id]); // send to client user data
 });
 
 server.get("/users/", (req, res) => {
+  // return list of users
   return res.json(users);
 });
 
 //Update
 server.put("/users/:id", (req, res) => {
+  // update users name
   const { id } = req.params;
   const { name } = req.body;
 
@@ -39,6 +41,7 @@ server.put("/users/:id", (req, res) => {
 
 // Deleate
 server.delete("/users/:id", (req, res) => {
+  // remove one user from list
   const { id } = req.params;
 
   users.splice(id, 1);
