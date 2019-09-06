@@ -1,81 +1,24 @@
-const express = require("express"); // require micro framework
+const express = require("express"); // Call uframework
+const Project = require("./project.js"); // call project object
 
-const server = express(); // Define server variable
+const server = express(); // define server variable
 
-const users = ["Dimas", "Jorge", "Renato"];
+const list = []; // projects list
 
-server.use(express.json());
+server.use(express.json()); // Adapt to read json
 
-// Middlware
-server.use((req, res, next) => {
-  console.log(`Método: ${req.method}; URL: ${req.url}`);
-  console.time("Request");
-  next();
-  console.timeEnd("Request");
-});
+// create a project
+server.post("/projects", (req, res) => {
+  const project = new Project(req.body);
 
-// Check user exists
-const checkUser = (req, res, next) => {
-  if (!req.body.name) {
-    return res.status(400).json({ error: "Users name is required" });
-  }
-  next();
-};
-
-const checkUserId = (req, res, next) => {
-  const user = users[req.params.id];
-
-  if (!users[req.params.id]) {
-    return res.status(400).json({ error: "User not exist" });
+  console.log(project);
+  if (!project.id) {
+    return res.status(400).json({ error: "Projects infos is required" });
   }
 
-  req.user = user;
+  list.push(project);
 
-  next();
-};
-
-// CRUD
-//Create
-server.post("/users/", checkUser, (req, res) => {
-  const { name } = req.body;
-  users.push(name);
-
-  return res.json(users);
+  return res.json(list);
 });
 
-//Read
-server.get("/users/:id/", checkUserId, (req, res) => {
-  // Select one user
-  // const { id } = req.params; | get route params
-
-  // return res.json(users[id]); | send to client user data
-  return res.json(req.user);
-});
-
-server.get("/users/", (req, res) => {
-  // return list of users
-  return res.json(users);
-});
-
-//Update
-server.put("/users/:id", checkUserId, checkUser, (req, res) => {
-  // update users name
-  const { id } = req.params;
-  const { name } = req.body;
-
-  users[id] = name;
-
-  return res.json(users);
-});
-
-// Deleate
-server.delete("/users/:id", checkUserId, (req, res) => {
-  // remove one user from list
-  const { id } = req.params;
-
-  users.splice(id, 1);
-
-  return res.json(users);
-});
-
-server.listen("3000"); // Set port
+server.listen(3000);
