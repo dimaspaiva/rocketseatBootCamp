@@ -14,9 +14,29 @@ server.use((req, res, next) => {
   console.timeEnd("Request");
 });
 
+// Check user exists
+const checkUser = (req, res, next) => {
+  if (!req.body.name) {
+    return res.status(400).json({ error: "Users name is required" });
+  }
+  next();
+};
+
+const checkUserId = (req, res, next) => {
+  const user = users[req.params.id];
+
+  if (!users[req.params.id]) {
+    return res.status(400).json({ error: "User not exist" });
+  }
+
+  req.user = user;
+
+  next();
+};
+
 // CRUD
 //Create
-server.post("/users/", (req, res) => {
+server.post("/users/", checkUser, (req, res) => {
   const { name } = req.body;
   users.push(name);
 
@@ -24,11 +44,12 @@ server.post("/users/", (req, res) => {
 });
 
 //Read
-server.get("/users/:id/", (req, res) => {
+server.get("/users/:id/", checkUserId, (req, res) => {
   // Select one user
-  const { id } = req.params; // get route params
+  // const { id } = req.params; | get route params
 
-  return res.json(users[id]); // send to client user data
+  // return res.json(users[id]); | send to client user data
+  return res.json(req.user);
 });
 
 server.get("/users/", (req, res) => {
@@ -37,7 +58,7 @@ server.get("/users/", (req, res) => {
 });
 
 //Update
-server.put("/users/:id", (req, res) => {
+server.put("/users/:id", checkUserId, checkUser, (req, res) => {
   // update users name
   const { id } = req.params;
   const { name } = req.body;
@@ -48,7 +69,7 @@ server.put("/users/:id", (req, res) => {
 });
 
 // Deleate
-server.delete("/users/:id", (req, res) => {
+server.delete("/users/:id", checkUserId, (req, res) => {
   // remove one user from list
   const { id } = req.params;
 
